@@ -9,7 +9,7 @@ import java.util.ArrayList;
 public class Movable extends Drawable {
     public Collision collision;
     public float speed;
-    public float elasticity = 1f;
+    public float elasticity = 0f;
     public float mass = 1f;
 
     public float rotation;
@@ -450,26 +450,26 @@ public class Movable extends Drawable {
         if(!collisionPoints.isEmpty()){
             switch (collision1.collisionType){
                 case "BoxCollision":
-                    float hitBoxWidth2 = (float) BoxCollision.class.getDeclaredField("hitBoxWidth").get(collision);
-                    float hitBoxHeight2 = (float) BoxCollision.class.getDeclaredField("hitBoxHeight").get(collision);
+                    float hitBoxWidth2 = (float) BoxCollision.class.getDeclaredField("hitBoxWidth").get(collision1);
+                    float hitBoxHeight2 = (float) BoxCollision.class.getDeclaredField("hitBoxHeight").get(collision1);
 
-                    float rotation1 = (float) LineCollision.class.getDeclaredField("rotation").get(collision1);
+                    float rotation1 = (float) LineCollision.class.getDeclaredField("rotation").get(collision);
 
                     if(collisionPoints.size() == 1) {
-                        float height = (float) LineCollision.class.getDeclaredField("height").get(collision1);
+                        float height = (float) LineCollision.class.getDeclaredField("height").get(collision);
 
                         float deltaSin = (float) (Math.sin((rotation1*0.0174532925)));
                         float deltaCos = (float) (Math.cos((rotation1*0.0174532925)));
 
-                        float x2 = collision1.x + deltaSin * height;
-                        float y2 = collision1.y + deltaCos * height;
+                        float x2 = x + deltaSin * height;
+                        float y2 = y + deltaCos * height;
 
                         float x1;
                         float y1;
-                        if(collision.findPointCollision(collision1.x, collision1.y)){
-                            x1 = collision1.x;
-                            y1 = collision1.y;
-                        }else if(collision.findPointCollision(x2, y2)){
+                        if(collision1.findPointCollision(x, y)){
+                            x1 = x;
+                            y1 = y;
+                        }else if(collision1.findPointCollision(x2, y2)){
                             x1 = x2;
                             y1 = y2;
                         }else {
@@ -477,8 +477,8 @@ public class Movable extends Drawable {
                             y1 = collisionPoints.get(0)[1];
                         }
 
-                        x2 = x1 - x;
-                        y2 = y1 - y;
+                        x2 = x1 - collision1.x;
+                        y2 = y1 - collision1.y;
                         if(x2 < 0){
                             x2 *= -1;
                         }
@@ -488,51 +488,35 @@ public class Movable extends Drawable {
                         x2 -= hitBoxWidth2;
                         y2 -= hitBoxHeight2;
                         if(x2 >= y2){
-                            if(x > x1){
-                                x = x1 + hitBoxWidth2;
+                            if(collision1.x < x1){
+                                x = collision1.x + hitBoxWidth2 + (x - x1);
                                 rotation1 = 90;
                             }else {
-                                x = x1 - hitBoxWidth2;
+                                x = collision1.x - hitBoxWidth2 + (x - x1);
                                 rotation1 = 270;
                             }
                         }else {
-                            if(y > y1){
-                                y = y1 + hitBoxHeight2;
+                            if(collision1.y < y1){
+                                y = collision1.y + hitBoxHeight2 + (y - y1);
                                 rotation1 = 0;
                             }else {
-                                y = y1 - hitBoxHeight2;
+                                y = collision1.y - hitBoxHeight2 + (y - y1);
                                 rotation1 = 180;
                             }
                         }
                     }else {
                         if(!(collisionPoints.get(0)[1] - collisionPoints.get(1)[1] > -0.0001f && collisionPoints.get(0)[1] - collisionPoints.get(1)[1] < 0.0001f)){
-                            if (collisionPoints.get(0)[0] > x) {
-                                if(x - collisionPoints.get(0)[0] > x - collisionPoints.get(1)[0]){
-                                    x = collisionPoints.get(0)[0] - hitBoxWidth2;
-                                }else {
-                                    x = collisionPoints.get(1)[0] - hitBoxWidth2;
-                                }
+                            if (collisionPoints.get(0)[0] > collision1.x) {
+                                x = collision1.x + hitBoxWidth2 + (x - (collisionPoints.get(0)[0] + collisionPoints.get(1)[0]) / 2);
                             } else {
-                                if(x - collisionPoints.get(0)[0] < x - collisionPoints.get(1)[0]){
-                                    x = collisionPoints.get(0)[0] + hitBoxWidth2;
-                                }else {
-                                    x = collisionPoints.get(1)[0] + hitBoxWidth2;
-                                }
+                                x = collision1.x - hitBoxWidth2 + (x - (collisionPoints.get(0)[0] + collisionPoints.get(1)[0]) / 2);
                             }
                         }
                         if(!(collisionPoints.get(0)[0] - collisionPoints.get(1)[0] > -0.0001f && collisionPoints.get(0)[0] - collisionPoints.get(1)[0] < 0.0001f)){
-                            if (collisionPoints.get(0)[1] > y) {
-                                if(y - collisionPoints.get(0)[1] < y - collisionPoints.get(1)[1]){
-                                    y = collisionPoints.get(0)[1] - hitBoxHeight2;
-                                }else {
-                                    y = collisionPoints.get(1)[1] - hitBoxHeight2;
-                                }
+                            if (collisionPoints.get(0)[1] > collision1.y) {
+                                y = collision1.y + hitBoxHeight2 + (y - (collisionPoints.get(0)[1] + collisionPoints.get(1)[1]) / 2);
                             } else {
-                                if(y - collisionPoints.get(0)[1] < y - collisionPoints.get(1)[1]){
-                                    y = collisionPoints.get(0)[1] + hitBoxHeight2;
-                                }else {
-                                    y = collisionPoints.get(1)[1] + hitBoxHeight2;
-                                }
+                                y = collision1.y - hitBoxHeight2 + (y - (collisionPoints.get(0)[1] + collisionPoints.get(1)[1]) / 2);
                             }
                         }
 
@@ -543,15 +527,15 @@ public class Movable extends Drawable {
                         }
 
                         if(rotation1 > 180 || rotation1 == 0){
-                            rotation1 -= 90;
-                        }else {
                             rotation1 += 90;
+                        }else {
+                            rotation1 -= 90;
                         }
 
-                        if(y > collisionPoints.get(0)[1]){
+                        if(collision1.y > collisionPoints.get(0)[1]){
                             rotation1 += 180;
                         }
-                        if(x > collisionPoints.get(0)[0] && collisionPoints.get(0)[0] == collisionPoints.get(1)[0]){
+                        if(collision1.x > collisionPoints.get(0)[0] && collisionPoints.get(0)[0] == collisionPoints.get(1)[0]){
                             rotation1 += 180;
                         }
                     }
@@ -567,38 +551,38 @@ public class Movable extends Drawable {
                 case "CircleCollision":
                     float radius = (float) CircleCollision.class.getDeclaredField("radius").get(collision1);
                     rotation1 = (float) LineCollision.class.getDeclaredField("rotation").get(collision);
+                    float height = (float) LineCollision.class.getDeclaredField("height").get(collision);
 
-                    float x1 = 0;
-                    float y1 = 0;
+                    float x1;
+                    float y1;
 
                     if(collisionPoints.size() > 1) {
                         x1 = (collisionPoints.get(0)[0] + collisionPoints.get(1)[0]) / 2;
                         y1 = (collisionPoints.get(0)[1] + collisionPoints.get(1)[1]) / 2;
                     }else {
-//                        float height = (float) LineCollision.class.getDeclaredField("height").get(collision1);
-//
-//                        float x2 = (float) (collision1.x + height*Math.sin((rotation1*0.0174532925)));
-//                        float y2 = (float) (collision1.y + height*Math.cos((rotation1*0.0174532925)));
-//
-//                        if(collision.findPointCollision(collision1.x, collision1.y)){
-//                            x1 = collision1.x;
-//                            y1 = collision1.y;
-//                        }else if(collision.findPointCollision(x2, y2)){
-//                            x1 = x2;
-//                            y1 = y2;
-//                        }else {
-//                            x1 = collisionPoints.get(0)[0];
-//                            y1 = collisionPoints.get(0)[1];
-//                        }
-//
-//                        if((x < collision1.x && x > x2) || (x > collision1.x && x < x2)){
-//                            x1 = (x1 + collisionPoints.get(0)[0])/2;
-//                        }
-//                        if((y < collision1.y && y > y2) || (y > collision1.y && y < y2)){
-//                            y1 = (y1 + collisionPoints.get(0)[1])/2;
-//                        }
+                        float x2 = (float) (x + height * Math.sin((rotation1*0.0174532925)));
+                        float y2 = (float) (y + height * Math.cos((rotation1*0.0174532925)));
+
+                        if(collision1.findPointCollision(collision.x, collision.y)){
+                            x1 = x;
+                            y1 = y;
+                        }else if(collision1.findPointCollision(x2, y2)){
+                            x1 = x2;
+                            y1 = y2;
+                        }else {
+                            x1 = collisionPoints.get(0)[0];
+                            y1 = collisionPoints.get(0)[1];
+                        }
+
+                        if((x < collision1.x && x > x2) || (x > collision1.x && x < x2)){
+                            x1 = (x1 + collisionPoints.get(0)[0])/2;
+                        }
+                        if((y < collision1.y && y > y2) || (y > collision1.y && y < y2)){
+                            y1 = (y1 + collisionPoints.get(0)[1])/2;
+                        }
                     }
-                    float height = (float) Math.sqrt((x1-collision1.x)*(x1-collision1.x) + (y1-collision1.y)*(y1-collision1.y));
+
+                    height = (float) Math.sqrt((x1-collision1.x)*(x1-collision1.x) + (y1-collision1.y)*(y1-collision1.y));
 
                     if(collision1.y > y1){
                         rotation2 = (float) (Math.asin((collision1.x - x1) / height)/0.0174532925) + 180;
@@ -612,66 +596,15 @@ public class Movable extends Drawable {
                     float x3 = modSin * radius;
                     float y3 = modCos * radius;
 
-                    x = x1 + x3;
-                    y = y1 + y3;
+                    x = collision1.x + x3 + (x - x1);
+                    y = collision1.y + y3 + (y - y1);
 
-//                    if(movable != null){
-//                        movable.changeSpeed(rotation2+180, (mass/movable.mass)*speed);
-//                        changeSpeed(rotation2, (movable.mass/mass)*speed);
-//                    }else {
-//                        changeSpeed(rotation2);
-//                    }
-//                    radius = (float) CircleCollision.class.getDeclaredField("radius").get(collision);
-//                    float rotation1 = (float) LineCollision.class.getDeclaredField("rotation").get(collision1);
-//
-//                    if(collisionPoints.size() > 1) {
-//                        x1 = (collisionPoints.get(0)[0] + collisionPoints.get(1)[0]) / 2;
-//                        y1 = (collisionPoints.get(0)[1] + collisionPoints.get(1)[1]) / 2;
-//                    }else {
-//                        float height = (float) LineCollision.class.getDeclaredField("height").get(collision1);
-//
-//                        float x2 = (float) (collision1.x + height*Math.sin((rotation1*0.0174532925)));
-//                        float y2 = (float) (collision1.y + height*Math.cos((rotation1*0.0174532925)));
-//
-//                        if(collision.findPointCollision(collision1.x, collision1.y)){
-//                            x1 = collision1.x;
-//                            y1 = collision1.y;
-//                        }else if(collision.findPointCollision(x2, y2)){
-//                            x1 = x2;
-//                            y1 = y2;
-//                        }else {
-//                            x1 = collisionPoints.get(0)[0];
-//                            y1 = collisionPoints.get(0)[1];
-//                        }
-//
-//                        if((x < collision1.x && x > x2) || (x > collision1.x && x < x2)){
-//                            x1 = (x1 + collisionPoints.get(0)[0])/2;
-//                        }
-//                        if((y < collision1.y && y > y2) || (y > collision1.y && y < y2)){
-//                            y1 = (y1 + collisionPoints.get(0)[1])/2;
-//                        }
-//                    }
-//                    float height = (float) Math.sqrt((x1-x)*(x1-x) + (y1-y)*(y1-y));
-//                    rotation2 = (float) (Math.asin((x1 - x) / height)/0.0174532925) + 180;
-//                    if(y > y1){
-//                        rotation2 = (float) (Math.asin((x - x1) / height)/0.0174532925);
-//                    }
-//
-//                    float modSin = (float) Math.sin(Math.toRadians(rotation2));
-//                    float modCos = (float) Math.cos(Math.toRadians(rotation2));
-//
-//                    float x3 = modSin * radius;
-//                    float y3 = modCos * radius;
-//
-//                    x = x1 + x3;
-//                    y = y1 + y3;
-//
-//                    if(movable != null){
-//                        movable.changeSpeed(rotation2+180, (mass/movable.mass)*speed);
-//                        changeSpeed(rotation2, (movable.mass/mass)*speed);
-//                    }else {
-//                        changeSpeed(rotation2);
-//                    }
+                    if(movable != null){
+                        movable.changeSpeed(rotation2+180, (mass/movable.mass)*speed);
+                        changeSpeed(rotation2, (movable.mass/mass)*speed);
+                    }else {
+                        changeSpeed(rotation2);
+                    }
                     break;
                 case "PolygonalCollision":
 

@@ -24,7 +24,7 @@ public class Collision  extends Drawable {
                     float height = (float) LineCollision.class.getDeclaredField("height").get(this);
                     float rotation = (float) LineCollision.class.getDeclaredField("rotation").get(this);
 
-                    points.addAll(findLineCollisionPoints(
+                    points.addAll(collision.findLineCollisionPoints(
                             this.x,
                             this.y,
                             (float) (this.x + height*Math.sin((rotation*0.0174532925))),
