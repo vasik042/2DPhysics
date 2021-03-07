@@ -26,15 +26,6 @@ public class Movable extends Drawable {
         correctSpeed();
         setPos();
     }
-    private void changeSpeed (Movable movable, float rotation){
-        movable.changeSpeed(rotation+180, (mass/movable.mass)*speed);
-        changeSpeed(rotation, (movable.mass/mass)*speed);
-    }
-
-    private float correctPosition(Collision collision1){
-        return 0.1f;
-    }
-
 
     private float boxToBox(BoxCollision collision1, BoxCollision collision2){
         float rotation1;
@@ -124,7 +115,172 @@ public class Movable extends Drawable {
         return rotation1;
     }
 
-//    private float lineToLine(LineCollision collision1, LineCollision collision2, ArrayList<float[]> collisionPoints){}
+    private float lineToLine(LineCollision collision1, LineCollision collision2, ArrayList<float[]> collisionPoints){
+        float rotation1 = collision1.rotation;
+        float rotation2 = collision2.rotation;
+
+        float x12 = (float) (collision1.x + collision1.height*Math.sin((rotation1*0.0174532925)));
+        float y12 = (float) (collision1.y + collision1.height*Math.cos((rotation1*0.0174532925)));
+
+        float deltaX11 = collision1.x - collisionPoints.get(0)[0];
+        float deltaY11 = collision1.y - collisionPoints.get(0)[1];
+        float deltaX12 = x12 - collisionPoints.get(0)[0];
+        float deltaY12 = y12 - collisionPoints.get(0)[1];
+
+        float x22 = (float) (collision2.x + collision2.height*Math.sin((rotation2*0.0174532925)));
+        float y22 = (float) (collision2.y + collision2.height*Math.cos((rotation2*0.0174532925)));
+
+        float deltaX21 = collision2.x - collisionPoints.get(0)[0];
+        float deltaY21 = collision2.y - collisionPoints.get(0)[1];
+        float deltaX22 = x22 - collisionPoints.get(0)[0];
+        float deltaY22 = y22 - collisionPoints.get(0)[1];
+
+        if(deltaX11 < 0){
+            deltaX11 *= -1;
+        }
+        if(deltaX12 < 0){
+            deltaX12 *= -1;
+        }
+        if(deltaY11 < 0){
+            deltaY11 *= -1;
+        }
+        if(deltaY12 < 0){
+            deltaY12 *= -1;
+        }
+
+        if(deltaX21 < 0){
+            deltaX21 *= -1;
+        }
+        if(deltaX22 < 0){
+            deltaX22 *= -1;
+        }
+        if(deltaY21 < 0){
+            deltaY21 *= -1;
+        }
+        if(deltaY22 < 0){
+            deltaY22 *= -1;
+        }
+
+        if(rotation1 > 360){
+            rotation1 -= 360;
+        }else if(rotation1 <= 0){
+            rotation1 += 360;
+        }
+
+        if(rotation2 > 360){
+            rotation2 -= 360;
+        }else if(rotation2 <= 0){
+            rotation2 += 360;
+        }
+
+        if(deltaX22 > deltaX21){
+            deltaX22 = 0;
+        }else {
+            deltaX21 = 0;
+        }
+        if(deltaY22 > deltaY21){
+            deltaY22 = 0;
+        }else {
+            deltaY21 = 0;
+        }
+
+        boolean itsHard = true;
+        if((rotation2 > 45 && rotation2 < 135) || (rotation2 > 225 && rotation2 < 315)){
+            if((rotation1 > 45 && rotation1 < 135) || (rotation1 > 225 && rotation1 < 315)){
+                if(deltaX11 < deltaX21 || deltaX11 < deltaX22 || deltaX12 < deltaX21 || deltaX12 < deltaX22){
+                    itsHard = false;
+                }
+            }else {
+                if(deltaY11 < deltaX21 || deltaY11 < deltaX22 || deltaY12 < deltaX21 || deltaY12 < deltaX22){
+                    itsHard = false;
+                }
+            }
+        }else {
+            if((rotation1 > 45 && rotation1 < 135) || (rotation1 > 225 && rotation1 < 315)){
+                if(deltaX11 < deltaY21 || deltaX11 < deltaY22 || deltaX12 < deltaY21 || deltaX12 < deltaY22){
+                    itsHard = false;
+                }
+            }else {
+                if(deltaY11 < deltaY21 || deltaY11 < deltaY22 || deltaY12 < deltaY21 || deltaY12 < deltaY22){
+                    itsHard = false;
+                }
+            }
+        }
+
+        if(itsHard){
+            float deltaX = collisionPoints.get(0)[0] - collision2.x;
+            float deltaY = collisionPoints.get(0)[1] - collision2.y;
+
+            if((rotation2 > 45 && rotation2 < 135) || (rotation2 > 225 && rotation2 < 315)){
+                deltaX21 = collision2.x - collisionPoints.get(0)[0];
+                deltaX22 = x22 - collisionPoints.get(0)[0];
+
+                if(deltaX21 < 0){
+                    deltaX21 *= -1;
+                }
+                if(deltaX22 < 0){
+                    deltaX22 *= -1;
+                }
+
+                if (deltaX22 < deltaX21) {
+                    deltaX -= collision2.height*Math.sin((rotation2*0.0174532925));
+                    deltaY -= collision2.height*Math.cos((rotation2*0.0174532925));
+
+                    rotation1 -= 90;
+                }else{
+                    rotation1 += 90;
+                }
+            }else {
+                deltaY21 = collision2.y - collisionPoints.get(0)[1];
+                deltaY22 = y22 - collisionPoints.get(0)[1];
+
+                if(deltaY21 < 0){
+                    deltaY21 *= -1;
+                }
+                if(deltaY22 < 0){
+                    deltaY22 *= -1;
+                }
+
+                if (deltaY22 < deltaY21) {
+                    deltaX -= collision2.height*Math.sin((rotation2*0.0174532925));
+                    deltaY -= collision2.height*Math.cos((rotation2*0.0174532925));
+
+                    rotation1 -= 90;
+                }else{
+                    rotation1 += 90;
+                }
+
+            }
+            if(rotation2 == 180 || rotation2 == 0){
+                rotation1 += 180;
+            }
+
+            collision1.x -= deltaX;
+            collision1.y -= deltaY;
+
+            return rotation1;
+
+        }else {
+            if(deltaX11 > deltaX12 || deltaY11 > deltaY12){
+                collision1.x = (float) (collisionPoints.get(0)[0] - collision1.height*Math.sin((rotation1*0.0174532925)));
+                collision1.y = (float) (collisionPoints.get(0)[1] - collision1.height*Math.cos((rotation1*0.0174532925)));
+                if(rotation2 > 180 || rotation2 == 0){
+                    rotation2 -= 90;
+                }else {
+                    rotation2 += 90;
+                }
+            }else {
+                collision1.x = collisionPoints.get(0)[0];
+                collision1.y = collisionPoints.get(0)[1];
+                if(rotation2 > 180 || rotation2 == 0){
+                    rotation2 += 90;
+                }else {
+                    rotation2 -= 90;
+                }
+            }
+            return rotation2;
+        }
+    }
 
 
     private float circleToBox(CircleCollision collision1, BoxCollision collision2, boolean inverted){
@@ -531,7 +687,7 @@ public class Movable extends Drawable {
     }
 }
 
-    private void lineCollision(Collision collision1, Movable movable, ArrayList<float[]> collisionPoints){
+    private void lineCollision(Collision collision1, Movable movable, ArrayList<float[]> collisionPoints) throws NoSuchFieldException, IllegalAccessException {
         float rotation1 = 0;
         boolean polygonal = false;
 
@@ -540,11 +696,29 @@ public class Movable extends Drawable {
                 rotation1 = boxToLine((BoxCollision)  collision1, (LineCollision) collision, collisionPoints, true);
                 break;
             case "LineCollision":
+                rotation1 = lineToLine((LineCollision) collision, (LineCollision)  collision1, collisionPoints);
                 break;
             case "CircleCollision":
                 rotation1 = circleToLine((CircleCollision) collision1, (LineCollision)  collision, collisionPoints, true);
                 break;
             case "PolygonalCollision":
+                ArrayList<LineCollision> lines = (ArrayList<LineCollision>) PolygonalCollision.class.getDeclaredField("lines").get(collision1);
+                for (LineCollision l : lines) {
+                    collisionPoints = collision.findCollisionPoints(l);
+                    if(!collisionPoints.isEmpty()){
+                        rotation1 = lineToLine((LineCollision) collision, l, collisionPoints);
+
+                        x = collision.x;
+                        y = collision.y;
+
+                        if(movable != null){
+                            movable.changeSpeed(rotation1+180, (mass/movable.mass)*speed);
+                            changeSpeed(rotation1, (movable.mass/mass)*speed);
+                        }else {
+                            changeSpeed(rotation1);
+                        }
+                    }
+                }
                 polygonal = true;
                 break;
         }
