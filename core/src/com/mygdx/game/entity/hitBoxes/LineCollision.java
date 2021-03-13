@@ -5,6 +5,7 @@ import java.util.ArrayList;
 public class LineCollision extends Collision {
     public float height;
     public float rotation;
+    public float[] centre;
 
     public LineCollision(float x1, float y1, float x2, float y2) {
         super(x1, y1);
@@ -14,6 +15,7 @@ public class LineCollision extends Collision {
         if(y2 < y1){
             rotation = (float) (Math.asin((x1 - x2) / height)/0.0174532925) + 180;
         }
+        centre = new float[] {(x1+x2)/2, (y1+y2)/2};
 
         sprite.setSize(1, height);
         sprite.setOrigin(0, 0);

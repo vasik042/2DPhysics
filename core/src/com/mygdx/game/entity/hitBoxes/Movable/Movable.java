@@ -8,7 +8,7 @@ import java.util.ArrayList;
 public class Movable extends Drawable {
     public Collision collision;
     public float speed;
-    public float elasticity = 0f;
+    public float elasticity = 1f;
     public float mass = 1f;
 
     public float rotation;
@@ -251,7 +251,7 @@ public class Movable extends Drawable {
                 }
 
             }
-            if(rotation2 == 180 || rotation2 == 0){
+            if(rotation2 == 180 || rotation2 == 0 || rotation2 == 90){
                 rotation1 += 180;
             }
 
@@ -264,18 +264,20 @@ public class Movable extends Drawable {
             if(deltaX11 > deltaX12 || deltaY11 > deltaY12){
                 collision1.x = (float) (collisionPoints.get(0)[0] - collision1.height*Math.sin((rotation1*0.0174532925)));
                 collision1.y = (float) (collisionPoints.get(0)[1] - collision1.height*Math.cos((rotation1*0.0174532925)));
-                if(rotation2 > 180 || rotation2 == 0){
-                    rotation2 -= 90;
-                }else {
+
+                if(rotation2 == 90){
                     rotation2 += 90;
+                }else {
+                    rotation2 -= 90;
                 }
             }else {
                 collision1.x = collisionPoints.get(0)[0];
                 collision1.y = collisionPoints.get(0)[1];
-                if(rotation2 > 180 || rotation2 == 0){
-                    rotation2 += 90;
-                }else {
+
+                if(rotation2 == 90){
                     rotation2 -= 90;
+                }else {
+                    rotation2 += 90;
                 }
             }
             return rotation2;
@@ -830,6 +832,8 @@ public class Movable extends Drawable {
 
 
     public void correctSpeed(){
+        changeSpeed(180, 0.5f);
+
         if(speed > 0.2){
             speed -= 0.2f;
         }else if (speed < -0.2){
@@ -837,11 +841,11 @@ public class Movable extends Drawable {
         }else {
             speed = 0.0001f;
         }
-        if(speed > 8){
-            speed = 8;
+        if(speed > 16){
+            speed = 16;
         }
-        if(speed < -8){
-            speed = -8;
+        if(speed < -16){
+            speed = -16;
         }
     }
 

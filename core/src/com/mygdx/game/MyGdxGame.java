@@ -66,36 +66,39 @@ public class MyGdxGame extends ApplicationAdapter {
 
 		batch = new SpriteBatch();
 
+		float[][] arr = {{10,5}, {0,250}, {50,240}, {80,80}, {70,80}, {70,75}, {165,75}, {165,80}, {160,80}, {170,250}, {240,240}, {230,0}};
 		Drawable d = new Drawable(400, 100, "1.png");
 		d.sprite.setOriginCenter();
-//		CircleCollision b = new CircleCollision(400, 100, 32);
-		LineCollision b = new LineCollision(300, 100, 500, 100);
+		CircleCollision b = new CircleCollision(400, 100, 32);
+//		LineCollision b = new LineCollision(300, 100, 400, 200);
 //		BoxCollision b = new BoxCollision(new Drawable(400, 100, "0.png"));
+//		PolygonalCollision b = new PolygonalCollision(400, 100, arr);
 		player = new Player(b);
 
-		collisions.add(new Wall(750,300, world, 100, 200));
+		collisions.add(new Wall(750,300, world, 20, 20));
+		collisions.add(new Wall(860,300, world, 100, 200));
 		collisions.add(new Wall(750,0, world, 1500, 50));
 
 
-		Movable line = new Movable(new LineCollision(500, 100, 300, 100));
+		LineCollision line = new LineCollision(500, 100, 300, 100);
 		Movable line2 = new Movable(new LineCollision(300, 500, 500, 500));
-		Movable line3 = new Movable(new LineCollision(300, 500, 300, 300));
+		LineCollision line3 = new LineCollision(300, 500, 300, 300);
 		Movable line4 = new Movable(new LineCollision(500, 300, 500, 500));
-		Movable line5 = new Movable(new LineCollision(300, 500, 500, 300));
+		LineCollision line5 = new LineCollision(500, 300, 300, 500);
 		Movable line6 = new Movable(new LineCollision(500, 300, 530, 700));
 
 
 		circle = new Movable(new CircleCollision(200, 200, 50));
 
 		movables.add(circle);
-		movables.add(line);
-//		movables.add(line2);
-//		movables.add(line3);
-//		movables.add(line4);
-//		movables.add(line5);
-//		movables.add(line6);
+		collisions.add(line);
+		movables.add(line2);
+		collisions.add(line3);
+		movables.add(line4);
+		collisions.add(line5);
+		movables.add(line6);
 
-//		float[][] array = {{10,5}, {0,250}, {50,240}, {80,80}, {70,80}, {70,75}, {165,75}, {165,80}, {160,80}, {170,250}, {240,240}, {230,0}};
+
 //		float[][] array = {{0,0}, {-300,75}, {0,150},{75,450}, {150,150}, {450,75}, {150,0}, {75,-300}};
 //		float[][] array = {{0,0}, {0,150}, {150,150}, {150,0}};
 
@@ -121,6 +124,20 @@ public class MyGdxGame extends ApplicationAdapter {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
 		batch.begin();
+
+		if(Gdx.input.isKeyPressed(Input.Keys.NUM_1)){
+			CircleCollision b = new CircleCollision(400, 100, 32);
+			player = new Player(b);
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.NUM_2)){
+			LineCollision b = new LineCollision(300, 100, 400, 200);
+			player = new Player(b);
+		}
+		if(Gdx.input.isKeyPressed(Input.Keys.NUM_3)){
+			BoxCollision b = new BoxCollision(new Drawable(400, 100, "0.png"));
+			player = new Player(b);
+		}
+
 
 //		if(Gdx.input.isKeyPressed(Input.Keys.A)){
 //			walls.get(0).x-=3;
@@ -170,6 +187,7 @@ public class MyGdxGame extends ApplicationAdapter {
 			m1.draw(batch);
 		}
 		collisions.get(0).sprite.setColor(0.1f, 0.55f, 0.2f, 1);
+		collisions.get(1).sprite.setColor(0.1f, 0.55f, 0.2f, 1);
 
 
 		try {

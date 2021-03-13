@@ -22,6 +22,7 @@ public class Player extends Movable{
 
     public void live(SpriteBatch batch, ArrayList<Collision> collisions, ArrayList<Movable> movables) throws NoSuchFieldException, IllegalAccessException {
         control();
+        correctSpeed();
         setPos();
         collision(batch, collisions, movables);
 
@@ -69,43 +70,26 @@ public class Player extends Movable{
     }
 
     public void control(){
-
-//        changeSpeed(180, 0.5f);
-
         if(Gdx.input.isKeyPressed(Input.Keys.A)){
-            changeSpeed(270, 1);
+            changeSpeed(270, 0.5f);
 
             isMoving = true;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.D)){
-            changeSpeed(90, 1);
+            changeSpeed(90, 0.5f);
 
             isMoving = true;
         }
 
         if(Gdx.input.isKeyPressed(Input.Keys.S)){
-            changeSpeed(180, 1);
+            changeSpeed(180, 0.5f);
 
             isMoving = true;
         }
         if(Gdx.input.isKeyPressed(Input.Keys.W)){
-            changeSpeed(0, 1);
+            changeSpeed(0, 1f);
 
             isMoving = true;
-        }
-        if(speed > 8){
-            speed = 8;
-        }
-        if(speed < -8){
-            speed = -8;
-        }
-
-        if(speed > 0.2){
-            speed -= 0.2f;
-        }else if (speed < -0.2){
-            speed += 0.2f;
-        }else {
-            speed = 0.0001f;
         }
     }
 }
